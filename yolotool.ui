@@ -13,18 +13,109 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="closeShowButton">
+  <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>150</y>
-     <width>102</width>
-     <height>32</height>
+     <x>340</x>
+     <y>20</y>
+     <width>141</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="text">
-    <string>closeButton</string>
+    <string>TextLabel</string>
    </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>190</y>
+     <width>125</width>
+     <height>143</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="startDectButton">
+      <property name="text">
+       <string>开始检测</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="selectVideoButton">
+      <property name="text">
+       <string>选择视频</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="selectPictureButton">
+      <property name="text">
+       <string>选择图片文件夹</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="closeShowButton">
+      <property name="text">
+       <string>closeButton</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>218</y>
+     <width>121</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>帧数：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="plainTextEdit">
+        <property name="plainText">
+         <string>1</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="radioButton">
+      <property name="text">
+       <string>显示视频</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="radioButton_2">
+      <property name="text">
+       <string>保存图片</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="radioButton_3">
+      <property name="text">
+       <string>保存txt</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
