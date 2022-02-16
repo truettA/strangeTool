@@ -23,6 +23,9 @@ private slots:
 
 
     void on_closeShowButton_clicked();
+    void on_startDectButton_clicked();
+    void on_rcpuButton_clicked();
+    void on_rgpuButton_clicked();
 };
 
 #endif // YOLOTOOL_H

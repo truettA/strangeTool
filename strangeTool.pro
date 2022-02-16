@@ -30,11 +30,13 @@ PKGCONFIG += opencv4
 SOURCES += \
     main.cpp \
     mainWidget.cpp \
+    rwfile.cpp \
     yolodetect.cpp \
     yolotool.cpp
 
 HEADERS += \
     mainWidget.h \
+    rwfile.h \
     yolodetect.h \
     yolotool.h
 
