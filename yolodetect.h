@@ -18,6 +18,9 @@ public:
     yoloDetect(QString video_src);
     ~yoloDetect();
 
+    void overloadeFunc(int, QString);
+    void overloadeFunc(int, QString) const;
+
 public:
     QString m_modelCfg;
     QString m_weightsFile;
