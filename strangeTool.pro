@@ -22,7 +22,22 @@ CONFIG += link_pkgconfig
 PKGCONFIG += opencv4
 }
 
+win32{
+OPENCV_INCLUDE_DIR = I:/opencv/build/include
+OPENCV_LIBRARY_LIB = I:/OpenCV/opencv/build/x64/vc15/bin/opencv_world455.dll
+OPENCV_LIBRARY_LIB_d = I:/opencv/opencv-build/bin/libopencv_calib3d430.dll \
+                       I:/opencv/opencv-build/bin/libopencv_core430.dll \
+                       I:/opencv/opencv-build/bin/libopencv_highgui430.dll \
+                       I:/opencv/opencv-build/bin/libopencv_imgcodecs430.dll \
+                       I:/opencv/opencv-build/bin/libopencv_imgproc430.dll \
+                       I:/opencv/opencv-build/bin/libopencv_objdetect430.dll
 
+INCLUDEPATH += $${OPENCV_INCLUDE_DIR}
+
+CONFIG(debug,debug|release):LIBS        += $${OPENCV_LIBRARY_LIB_d}
+CONFIG(release,debug|release):LIBS        += $${OPENCV_LIBRARY_LIB}
+}
+message($${LIBS})
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
