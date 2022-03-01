@@ -6,20 +6,21 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
 #include <opencv2/dnn.hpp>
+#include <QObject>
+#include <QThread>
 
 
 
 
-
-class yoloDetect
+class yoloDetect:public QObject
 {
 public:
-    yoloDetect();
-    yoloDetect(QString video_src);
+    yoloDetect(QObject *parent = nullptr);
+    yoloDetect(QString video_src, double thread);
     ~yoloDetect();
 
-    void overloadeFunc(int, QString);
-    void overloadeFunc(int, QString) const;
+
+
 
 public:
     QString m_modelCfg;
@@ -28,13 +29,22 @@ public:
 
     int backendId;
     int targetId;
+    double m_thread;
+    double m_NMSThread;
+
+    std::vector<cv::Rect> boxes;
+    std::vector<int> indices;
 
 private:
-    QVector<float> confidences;
+    std::vector<float> confidences;
     cv::dnn::Net net;
+    cv::Mat m_frame;
 
 public:
     void detctImg();
+    void getOutputNames(std::vector<std::string> &names);
+
+
 
 
 

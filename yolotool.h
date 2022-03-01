@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QEvent>
+#include "yolodetect.h"
 
 namespace Ui {
 class yoloTool;
@@ -18,6 +19,8 @@ public:
 
 private:
     Ui::yoloTool *ui;
+    yoloDetect *detect;
+    QThread *qThread;
 private slots:
     void closeEvent(QCloseEvent *event);
 
@@ -26,6 +29,9 @@ private slots:
     void on_startDectButton_clicked();
     void on_rcpuButton_clicked();
     void on_rgpuButton_clicked();
+    void on_selectPictureButton_clicked();
+    void on_selectCfgBtn_clicked();
+    void on_selectVideoButton_clicked();
 };
 
 #endif // YOLOTOOL_H

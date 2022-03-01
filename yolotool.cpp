@@ -4,7 +4,11 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
-#include <yolodetect.h>
+#include "yolodetect.h"
+#include <QThread>
+#include <QPushButton>
+#include <QFileDialog>
+#include "updataui.h"
 
 
 yoloTool::yoloTool(QWidget *parent) :
@@ -56,17 +60,29 @@ void yoloTool::on_startDectButton_clicked()
     * | DNN_TARGET_CUDA        |                    |                              |                    |                 + |
     * | DNN_TARGET_CUDA_FP16   |                    |                              |                    |                 + |
     */
-
-    yoloDetect detect = yoloDetect();
+    qDebug() << "master thread:" << QThread::currentThread();
+    detect = new yoloDetect();
     if(ui->rcpuButton->isChecked()){
-        detect.backendId = cv::dnn::DNN_BACKEND_OPENCV;
-        detect.targetId = cv::dnn::DNN_TARGET_CPU;
+        detect->backendId = cv::dnn::DNN_BACKEND_OPENCV;
+        detect->targetId = cv::dnn::DNN_TARGET_CPU;
     }else if(ui->rgpuButton->isChecked()){
-        detect.backendId = cv::dnn::DNN_BACKEND_CUDA;
-        detect.targetId = cv::dnn::DNN_TARGET_CUDA;
+        detect->backendId = cv::dnn::DNN_BACKEND_CUDA;
+        detect->targetId = cv::dnn::DNN_TARGET_CUDA;
     }
-    detect.m_modelCfg = ui->cfgEdit->text();
-    detect.m_weightsFile = ui->weightEdit->text();
+    detect->m_modelCfg = ui->cfgEdit->text();
+    detect->m_weightsFile = ui->weightEdit->text();
+    qThread = new QThread();
+    detect->moveToThread(qThread);
+//    connect(qThread, &QThread::started)
+    qThread->start();
+    connect(ui->selectVideoButton, &QPushButton::clicked, detect, &yoloDetect::detctImg);
+    connect(qThread, &QThread::started, detect, [=](){
+        qDebug() <<"started" <<QThread::currentThread();
+    });
+    connect(qThread, &QThread::finished, this, [=](){
+        qDebug() <<"finished" <<QThread::currentThread();
+    });
+
 
 }
 
@@ -80,5 +96,62 @@ void yoloTool::on_rcpuButton_clicked()
 void yoloTool::on_rgpuButton_clicked()
 {
     qDebug() << "gpu";
+}
+
+
+void yoloTool::on_selectPictureButton_clicked()
+{
+
+}
+
+void yoloTool::on_selectCfgBtn_clicked()
+{
+
+    qDebug() << "on_selectCfgBtn_clicked" << ";;; " << QThread::currentThread();
+    QFileDialog *fileDialog = new QFileDialog(this);
+    fileDialog->setWindowTitle("选择权重和配置文件");
+    QStringList filtersName;
+    filtersName << "(*.cfg *.weights)"
+                << "any file(*)";
+    fileDialog->setNameFilters(filtersName);
+    fileDialog->setFileMode(QFileDialog::ExistingFiles);
+    fileDialog->setViewMode(QFileDialog::Detail);
+    fileDialog->setDirectory(".");
+    QStringList cfgFile;
+    if(fileDialog->exec() == QDialog::Accepted){
+        qDebug() << "exec:";
+        cfgFile = fileDialog->selectedFiles();
+    }
+    ui->cfgEdit->setText(cfgFile.at(0));
+    ui->weightEdit->setText(cfgFile.at(1));
+//    QThread *thread = new QThread();
+//    UpdataUI *updataUi = new UpdataUI();
+//    updataUi->moveToThread(thread);
+//    connect(thread, &QThread::finished, updataUi, &QObject::deleteLater);//该线程结束时销毁
+//    thread->start();
+//    updataUi->operate(cfgFile);
+
+    delete fileDialog;
+}
+
+
+void yoloTool::on_selectVideoButton_clicked()
+{
+    QFileDialog *fileDialog = new QFileDialog(this);
+    fileDialog->setWindowTitle("选择权重和配置文件");
+    QStringList filtersName;
+    filtersName << "(*.mp4 *.avi *.flv)"
+                << "any file(*)";
+    fileDialog->setNameFilters(filtersName);
+    fileDialog->setFileMode(QFileDialog::ExistingFile);
+    fileDialog->setViewMode(QFileDialog::Detail);
+    fileDialog->setDirectory(".");
+    QStringList cfgFile;
+    if(fileDialog->exec() == QDialog::Accepted){
+        qDebug() << "exec:";
+       cfgFile = fileDialog->selectedFiles();
+    }
+    ui->videoFileEdit->setText(cfgFile[0]);
+    delete fileDialog;
 }
 

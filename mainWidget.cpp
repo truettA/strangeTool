@@ -2,7 +2,6 @@
 #include "ui_mainWidget.h"
 
 
-
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
