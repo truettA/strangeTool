@@ -32,6 +32,7 @@ private slots:
     void on_selectPictureButton_clicked();
     void on_selectCfgBtn_clicked();
     void on_selectVideoButton_clicked();
+    void on_saveBtn_clicked();
 };
 
 #endif // YOLOTOOL_H

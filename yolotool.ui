@@ -19,7 +19,7 @@
      <x>420</x>
      <y>250</y>
      <width>152</width>
-     <height>180</height>
+     <height>220</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -45,6 +45,13 @@
      </widget>
     </item>
     <item>
+     <widget class="QPushButton" name="saveBtn">
+      <property name="text">
+       <string>选择保存路径</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="startDectButton">
       <property name="text">
        <string>开始检测</string>
@@ -54,7 +61,7 @@
     <item>
      <widget class="QPushButton" name="closeShowButton">
       <property name="text">
-       <string>closeButton</string>
+       <string>关闭按钮</string>
       </property>
      </widget>
     </item>
@@ -107,6 +114,41 @@
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="2">
+     <widget class="QLineEdit" name="weightEdit">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QLineEdit" name="videoFileEdit">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_9">
+      <property name="text">
+       <string>保存路径：</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_8">
+      <property name="text">
+       <string>classes:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="2">
+     <widget class="QLineEdit" name="saveEdit">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
@@ -114,8 +156,8 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="weightEdit">
+    <item row="1" column="2">
+     <widget class="QLineEdit" name="cfgEdit">
       <property name="text">
        <string/>
       </property>
@@ -128,50 +170,15 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="cfgEdit">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
+    <item row="3" column="0">
      <widget class="QLabel" name="label_7">
       <property name="text">
        <string>视频路径:</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
-     <widget class="QLineEdit" name="videoFileEdit">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_8">
-      <property name="text">
-       <string>图片路径:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="cfgEdit_3">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_9">
-      <property name="text">
-       <string>保存路径：</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1">
-     <widget class="QLineEdit" name="cfgEdit_4">
+    <item row="2" column="2">
+     <widget class="QLineEdit" name="classesFileEdt">
       <property name="text">
        <string/>
       </property>
@@ -240,7 +247,7 @@
     <string>帧数：</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_4">
+  <widget class="QLineEdit" name="threadEdit">
    <property name="geometry">
     <rect>
      <x>135</x>

@@ -8,6 +8,7 @@
 #include <QThread>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QMessageBox>
 #include "updataui.h"
 
 
@@ -40,8 +41,7 @@ void yoloTool::on_closeShowButton_clicked()
     }else if(ui->rgpuButton->isChecked()){
         qDebug() << "rgup";
     }
-    qDebug() << ui->cfgEdit->text();
-    qDebug() << ui->weightEdit->text();
+
     cv::destroyWindow("show");
 }
 
@@ -61,7 +61,21 @@ void yoloTool::on_startDectButton_clicked()
     * | DNN_TARGET_CUDA_FP16   |                    |                              |                    |                 + |
     */
     qDebug() << "master thread:" << QThread::currentThread();
-    detect = new yoloDetect();
+    QString weight = ui->weightEdit->text();
+    if(weight.isEmpty()){
+        qDebug() << "weightFile is null!";
+    }
+    QString cfgFile = ui->cfgEdit->text();
+    if(cfgFile.isEmpty()){
+        qDebug() << "cfgFile is null!";
+    }
+    QString classesFile = ui->classesFileEdt->text();
+    if(classesFile.isEmpty()){
+        qDebug() << "classesFile is null!";
+    }
+    QString videoFile = ui->videoFileEdit->text();
+
+    detect = new yoloDetect(videoFile,cfgFile,weight,classesFile,ui->threadEdit->text().toDouble());
     if(ui->rcpuButton->isChecked()){
         detect->backendId = cv::dnn::DNN_BACKEND_OPENCV;
         detect->targetId = cv::dnn::DNN_TARGET_CPU;
@@ -69,13 +83,14 @@ void yoloTool::on_startDectButton_clicked()
         detect->backendId = cv::dnn::DNN_BACKEND_CUDA;
         detect->targetId = cv::dnn::DNN_TARGET_CUDA;
     }
-    detect->m_modelCfg = ui->cfgEdit->text();
-    detect->m_weightsFile = ui->weightEdit->text();
     qThread = new QThread();
     detect->moveToThread(qThread);
-//    connect(qThread, &QThread::started)
+
     qThread->start();
-    connect(ui->selectVideoButton, &QPushButton::clicked, detect, &yoloDetect::detctImg);
+    detect->init();
+    connect(ui->, &QPushButton::clicked, detect, &yoloDetect::detctImg);
+
+
     connect(qThread, &QThread::started, detect, [=](){
         qDebug() <<"started" <<QThread::currentThread();
     });
@@ -86,18 +101,15 @@ void yoloTool::on_startDectButton_clicked()
 
 }
 
-
 void yoloTool::on_rcpuButton_clicked()
 {
     qDebug() << "cup";
 }
 
-
 void yoloTool::on_rgpuButton_clicked()
 {
     qDebug() << "gpu";
 }
-
 
 void yoloTool::on_selectPictureButton_clicked()
 {
@@ -111,7 +123,7 @@ void yoloTool::on_selectCfgBtn_clicked()
     QFileDialog *fileDialog = new QFileDialog(this);
     fileDialog->setWindowTitle("选择权重和配置文件");
     QStringList filtersName;
-    filtersName << "(*.cfg *.weights)"
+    filtersName << "(*.cfg *.weights *.txt)"
                 << "any file(*)";
     fileDialog->setNameFilters(filtersName);
     fileDialog->setFileMode(QFileDialog::ExistingFiles);
@@ -122,8 +134,10 @@ void yoloTool::on_selectCfgBtn_clicked()
         qDebug() << "exec:";
         cfgFile = fileDialog->selectedFiles();
     }
+    //需要修改判断
     ui->cfgEdit->setText(cfgFile.at(0));
     ui->weightEdit->setText(cfgFile.at(1));
+    ui->classesFileEdt->setText(cfgFile[2]);
 //    QThread *thread = new QThread();
 //    UpdataUI *updataUi = new UpdataUI();
 //    updataUi->moveToThread(thread);
@@ -153,5 +167,13 @@ void yoloTool::on_selectVideoButton_clicked()
     }
     ui->videoFileEdit->setText(cfgFile[0]);
     delete fileDialog;
+}
+
+
+void yoloTool::on_saveBtn_clicked()
+{
+    QString savePath = QFileDialog::getExistingDirectory();
+
+    ui->saveEdit->setText(savePath);
 }
 

@@ -16,13 +16,12 @@ class yoloDetect:public QObject
 {
 public:
     yoloDetect(QObject *parent = nullptr);
-    yoloDetect(QString video_src, double thread);
+    yoloDetect(const QString &videoFile, const  QString &modelCfg, const QString &weightsFile, const QString &classesFile, double thread);
     ~yoloDetect();
 
 
-
-
 public:
+    QString m_videoFile;
     QString m_modelCfg;
     QString m_weightsFile;
     QString m_classesFile;
@@ -31,7 +30,9 @@ public:
     int targetId;
     double m_thread;
     double m_NMSThread;
+    double scalefactor;
 
+public:
     std::vector<cv::Rect> boxes;
     std::vector<int> indices;
 
@@ -39,10 +40,17 @@ private:
     std::vector<float> confidences;
     cv::dnn::Net net;
     cv::Mat m_frame;
+    cv::VideoCapture cap;
+    int m_width;
+    int m_height;
+
+private:
+    void getOutputNames(std::vector<std::string> &names);
 
 public:
+    bool init();
     void detctImg();
-    void getOutputNames(std::vector<std::string> &names);
+
 
 
 

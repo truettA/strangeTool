@@ -37,7 +37,7 @@ INCLUDEPATH += $${OPENCV_INCLUDE_DIR}
 CONFIG(debug,debug|release):LIBS        += $${OPENCV_LIBRARY_LIB_d}
 CONFIG(release,debug|release):LIBS        += $${OPENCV_LIBRARY_LIB}
 }
-message($${LIBS})
+
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
