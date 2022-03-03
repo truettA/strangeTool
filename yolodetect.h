@@ -8,6 +8,7 @@
 #include <opencv2/dnn.hpp>
 #include <QObject>
 #include <QThread>
+#include "yolotool.h"
 
 
 
@@ -48,11 +49,12 @@ private:
     void getOutputNames(std::vector<std::string> &names);
 
 public:
-    bool init();
+    bool init(yoloTool *yolotool);
     void detctImg();
 
 
-
+signals:
+    void sendBoxes(std::vector<cv::Rect> boxes);
 
 
 

@@ -33,12 +33,7 @@ void yoloDetect::detctImg()
 //    cv::imshow("show", frame);
 
     qDebug() << "child thread:" << QThread::currentThread();
-    if(m_frame.empty()){
-        qDebug() << "m_frame is null!";
-    }
-    if(!boxes.empty()){
-        boxes.clear();
-    }
+
     double confidence;
     cv::Mat blob;
 
@@ -47,6 +42,13 @@ void yoloDetect::detctImg()
 
 
     while(true){
+        cap.read(m_frame);
+        if(m_frame.empty()){
+            qDebug() << "m_frame is null!";
+        }
+        if(!boxes.empty()){
+            boxes.clear();
+        }
         cv::dnn::blobFromImage(m_frame, blob, scalefactor, cv::Size(width, height), false, false, false);
         net.setInput(blob);
         std::vector<cv::Mat> outs;
@@ -75,6 +77,7 @@ void yoloDetect::detctImg()
             }
         }
         cv::dnn::NMSBoxes(boxes, confidences, m_thread, m_NMSThread, indices);
+        cv::imshow("show", m_frame);
     }
 
 
@@ -94,7 +97,7 @@ void yoloDetect::getOutputNames(std::vector<std::string> &names)
     return;
 }
 
-bool yoloDetect::init()
+bool yoloDetect::init(yoloTool *yolotool)
 {
     net = cv::dnn::readNetFromDarknet(m_modelCfg.toStdString(), m_weightsFile.toStdString());
     if(net.empty()){
@@ -114,5 +117,7 @@ bool yoloDetect::init()
 
     m_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
     m_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+
+    connect(this, &yoloDetect::sendBoxes, yolotool, &yoloTool::recvBoxes);
 
 }

@@ -33,6 +33,9 @@ private slots:
     void on_selectCfgBtn_clicked();
     void on_selectVideoButton_clicked();
     void on_saveBtn_clicked();
+
+public slots:
+    void recvBoxes(std::vector<cv::Rect> boxes);
 };
 
 #endif // YOLOTOOL_H

@@ -87,8 +87,8 @@ void yoloTool::on_startDectButton_clicked()
     detect->moveToThread(qThread);
 
     qThread->start();
-    detect->init();
-    connect(ui->, &QPushButton::clicked, detect, &yoloDetect::detctImg);
+    detect->init(this);
+//    connect(ui->, &QPushButton::clicked, detect, &yoloDetect::detctImg);
 
 
     connect(qThread, &QThread::started, detect, [=](){
