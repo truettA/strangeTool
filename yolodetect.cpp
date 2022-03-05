@@ -97,7 +97,7 @@ void yoloDetect::getOutputNames(std::vector<std::string> &names)
     return;
 }
 
-bool yoloDetect::init(yoloTool *yolotool)
+bool yoloDetect::init()
 {
     net = cv::dnn::readNetFromDarknet(m_modelCfg.toStdString(), m_weightsFile.toStdString());
     if(net.empty()){
@@ -118,6 +118,11 @@ bool yoloDetect::init(yoloTool *yolotool)
     m_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
     m_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 
-    connect(this, &yoloDetect::sendBoxes, yolotool, &yoloTool::recvBoxes);
+
 
 }
+
+//void yoloDetect::sendBoxes(std::vector<cv::Rect> boxes)
+//{
+
+//}

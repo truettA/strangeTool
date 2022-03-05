@@ -8,13 +8,12 @@
 #include <opencv2/dnn.hpp>
 #include <QObject>
 #include <QThread>
-#include "yolotool.h"
-
-
 
 
 class yoloDetect:public QObject
 {
+    Q_OBJECT
+
 public:
     yoloDetect(QObject *parent = nullptr);
     yoloDetect(const QString &videoFile, const  QString &modelCfg, const QString &weightsFile, const QString &classesFile, double thread);
@@ -49,14 +48,12 @@ private:
     void getOutputNames(std::vector<std::string> &names);
 
 public:
-    bool init(yoloTool *yolotool);
+    bool init();
     void detctImg();
 
 
 signals:
-    void sendBoxes(std::vector<cv::Rect> boxes);
-
-
+//    void sendBoxes(std::vector<cv::Rect> boxes);
 
 
 };

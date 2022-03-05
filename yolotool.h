@@ -19,8 +19,9 @@ public:
 
 private:
     Ui::yoloTool *ui;
-    yoloDetect *detect;
+
     QThread *qThread;
+    yoloDetect *detect;
 private slots:
     void closeEvent(QCloseEvent *event);
 

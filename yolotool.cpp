@@ -1,16 +1,15 @@
-#include "yolotool.h"
-#include "ui_yolotool.h"
 #include <QDebug>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
-#include "yolodetect.h"
 #include <QThread>
 #include <QPushButton>
 #include <QFileDialog>
 #include <QMessageBox>
 #include "updataui.h"
-
+#include "yolotool.h"
+#include "ui_yolotool.h"
+#include "yolodetect.h"
 
 yoloTool::yoloTool(QWidget *parent) :
     QWidget(parent),
@@ -76,6 +75,9 @@ void yoloTool::on_startDectButton_clicked()
     QString videoFile = ui->videoFileEdit->text();
 
     detect = new yoloDetect(videoFile,cfgFile,weight,classesFile,ui->threadEdit->text().toDouble());
+//    connect(detect, &yoloDetect::sendBoxes, this, &yoloTool::recvBoxes);
+//    connect(detect, &yoloDetect::sendBoxes, nullptr, [](){});
+
     if(ui->rcpuButton->isChecked()){
         detect->backendId = cv::dnn::DNN_BACKEND_OPENCV;
         detect->targetId = cv::dnn::DNN_TARGET_CPU;
@@ -87,7 +89,8 @@ void yoloTool::on_startDectButton_clicked()
     detect->moveToThread(qThread);
 
     qThread->start();
-    detect->init(this);
+    detect->init();
+
 //    connect(ui->, &QPushButton::clicked, detect, &yoloDetect::detctImg);
 
 
@@ -134,6 +137,7 @@ void yoloTool::on_selectCfgBtn_clicked()
         qDebug() << "exec:";
         cfgFile = fileDialog->selectedFiles();
     }
+
     //需要修改判断
     ui->cfgEdit->setText(cfgFile.at(0));
     ui->weightEdit->setText(cfgFile.at(1));
@@ -175,5 +179,10 @@ void yoloTool::on_saveBtn_clicked()
     QString savePath = QFileDialog::getExistingDirectory();
 
     ui->saveEdit->setText(savePath);
+}
+
+void yoloTool::recvBoxes(std::vector<cv::Rect> boxes)
+{
+
 }
 
