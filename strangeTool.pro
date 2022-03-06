@@ -1,5 +1,5 @@
 QT       += core gui
-
+#https://www.its203.com/article/weixin_42842157/111715612?2022-03-05?2022-03-06
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -23,18 +23,29 @@ PKGCONFIG += opencv4
 }
 
 win32{
-OPENCV_INCLUDE_DIR = I:/opencv/build/include
-OPENCV_LIBRARY_LIB = I:/OpenCV/opencv/build/x64/vc15/bin/opencv_world455.dll
-OPENCV_LIBRARY_LIB_d = I:/opencv/opencv-build/bin/libopencv_calib3d430.dll \
-                       I:/opencv/opencv-build/bin/libopencv_core430.dll \
-                       I:/opencv/opencv-build/bin/libopencv_highgui430.dll \
-                       I:/opencv/opencv-build/bin/libopencv_imgcodecs430.dll \
-                       I:/opencv/opencv-build/bin/libopencv_imgproc430.dll \
-                       I:/opencv/opencv-build/bin/libopencv_objdetect430.dll
+OPENCV_INCLUDE_DIR = F:/OpenCV/build_minGW/install/include
+
+OPENCV_LIBRARY_LIB_DIR = F:/OpenCV/build_minGW/install/x64/mingw/bin
+OPENCV_LIBRARY_LIB = $${OPENCV_LIBRARY_LIB_DIR}/libopencv_core455.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_dnn455.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_highgui455.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_imgproc455.dll\
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_video455.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_videoio455.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_photo455.dll \
+
+OPENCV_LIBRARY_LIB_d = $${OPENCV_LIBRARY_LIB_DIR}/libopencv_core455d.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_dnn455d.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_highgui455d.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_imgproc455d.dll\
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_video455d.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_videoio455d.dll \
+                     $${OPENCV_LIBRARY_LIB_DIR}/libopencv_photo455d.dll \
+
 
 INCLUDEPATH += $${OPENCV_INCLUDE_DIR}
 
-CONFIG(debug,debug|release):LIBS        += $${OPENCV_LIBRARY_LIB_d}
+CONFIG(debug,debug|release):LIBS          += $${OPENCV_LIBRARY_LIB_d}
 CONFIG(release,debug|release):LIBS        += $${OPENCV_LIBRARY_LIB}
 }
 

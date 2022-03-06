@@ -11,14 +11,16 @@
 #include "ui_yolotool.h"
 #include "yolodetect.h"
 
+
 yoloTool::yoloTool(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::yoloTool)
 {
     ui->setupUi(this);
     ui->rcpuButton->setChecked(true);
-
-
+    qRegisterMetaType<std::vector<cv::Rect>>("std::vector<cv::Rect>");
+    // or
+    //Q_DECLARE_METATYPE(std::vector<cv::Rect);
 }
 
 yoloTool::~yoloTool()
@@ -75,7 +77,7 @@ void yoloTool::on_startDectButton_clicked()
     QString videoFile = ui->videoFileEdit->text();
 
     detect = new yoloDetect(videoFile,cfgFile,weight,classesFile,ui->threadEdit->text().toDouble());
-//    connect(detect, &yoloDetect::sendBoxes, this, &yoloTool::recvBoxes);
+    connect(detect, &yoloDetect::sendBoxes, this, &yoloTool::recvBoxes);
 //    connect(detect, &yoloDetect::sendBoxes, nullptr, [](){});
 
     if(ui->rcpuButton->isChecked()){
@@ -139,9 +141,12 @@ void yoloTool::on_selectCfgBtn_clicked()
     }
 
     //需要修改判断
-    ui->cfgEdit->setText(cfgFile.at(0));
-    ui->weightEdit->setText(cfgFile.at(1));
-    ui->classesFileEdt->setText(cfgFile[2]);
+    if(!cfgFile.isEmpty()){
+        ui->cfgEdit->setText(cfgFile.at(0));
+        ui->weightEdit->setText(cfgFile.at(1));
+        ui->classesFileEdt->setText(cfgFile[2]);
+    }
+
 //    QThread *thread = new QThread();
 //    UpdataUI *updataUi = new UpdataUI();
 //    updataUi->moveToThread(thread);
@@ -149,12 +154,13 @@ void yoloTool::on_selectCfgBtn_clicked()
 //    thread->start();
 //    updataUi->operate(cfgFile);
 
-    delete fileDialog;
+    fileDialog->destroyed();
 }
 
 
 void yoloTool::on_selectVideoButton_clicked()
 {
+    qDebug() << "选择视频文件";
     QFileDialog *fileDialog = new QFileDialog(this);
     fileDialog->setWindowTitle("选择权重和配置文件");
     QStringList filtersName;
@@ -164,23 +170,25 @@ void yoloTool::on_selectVideoButton_clicked()
     fileDialog->setFileMode(QFileDialog::ExistingFile);
     fileDialog->setViewMode(QFileDialog::Detail);
     fileDialog->setDirectory(".");
-    QStringList cfgFile;
+    QStringList videoFilePath;
     if(fileDialog->exec() == QDialog::Accepted){
-        qDebug() << "exec:";
-       cfgFile = fileDialog->selectedFiles();
+       videoFilePath = fileDialog->selectedFiles();
     }
-    ui->videoFileEdit->setText(cfgFile[0]);
-    delete fileDialog;
+    if(!videoFilePath.isEmpty()){
+        ui->videoFileEdit->setText(videoFilePath[0]);
+    }
+    fileDialog->destroyed();
 }
 
 
 void yoloTool::on_saveBtn_clicked()
 {
     QString savePath = QFileDialog::getExistingDirectory();
+    if(!savePath.isEmpty()){
+        ui->saveEdit->setText(savePath);
+    }
 
-    ui->saveEdit->setText(savePath);
 }
-
 void yoloTool::recvBoxes(std::vector<cv::Rect> boxes)
 {
 

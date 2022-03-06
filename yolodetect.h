@@ -53,7 +53,7 @@ public:
 
 
 signals:
-//    void sendBoxes(std::vector<cv::Rect> boxes);
+    void sendBoxes(std::vector<cv::Rect> boxes);
 
 
 };
