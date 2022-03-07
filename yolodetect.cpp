@@ -17,6 +17,7 @@ yoloDetect::yoloDetect(const QString &videoFile,const  QString &modelCfg,const Q
     m_weightsFile = weightsFile;
     m_classesFile = classesFile;
     m_thread = thread;
+    m_NMSThread = 0.35;
     scalefactor = 1/255.0;
 
 
@@ -42,20 +43,28 @@ void yoloDetect::detctImg()
 
 
     while(true){
+        QElapsedTimer time;
+        time.start();
         cap.read(m_frame);
         if(m_frame.empty()){
             qDebug() << "m_frame is null!";
+            break;
         }
-        if(!boxes.empty()){
+        qDebug() <<"cols:"<< m_frame.cols;
+        qDebug() <<"rows:" << m_frame.rows;
+        if(!boxes.empty() or !confidences.empty()){
             boxes.clear();
+            confidences.clear();
+            indices.clear();
         }
-        cv::dnn::blobFromImage(m_frame, blob, scalefactor, cv::Size(width, height), false, false, false);
+        cv::dnn::blobFromImage(m_frame, blob, scalefactor, cv::Size(width, height), cv::Scalar(), true, false);
         net.setInput(blob);
         std::vector<cv::Mat> outs;
         std::vector<std::string> names;
         this->getOutputNames(names);
         net.forward(outs, names);
         std::vector<int> classIds;
+        qDebug() << "outs.size:" << outs.size();
         for(int i = 0; i < outs.size(); i++){
             float* data = (float*)outs[i].data;
             for(int j = 0; j < outs[i].rows; j++, data += outs[i].cols){
@@ -76,11 +85,20 @@ void yoloDetect::detctImg()
                 }
             }
         }
+        qDebug() << "boxes.size::" << boxes.size() << "confidences.size:" << confidences.size();
+        qDebug() << m_thread << " " << m_NMSThread;
         cv::dnn::NMSBoxes(boxes, confidences, m_thread, m_NMSThread, indices);
-        cv::imshow("show", m_frame);
+        std::vector<cv::Rect> boxess;
+        for(auto i:indices){
+            int idx = i;
+            cv::Rect box = boxes[idx];
+            boxess.push_back(box);
+        }
+        int milsec = time.elapsed(); //获取片段运行时间
+        qDebug() << "boxes.size:" << boxess.size();
+        emit sendBoxes(boxess, m_frame);
+//        cv::imshow("show", m_frame);
     }
-
-
 
 }
 
@@ -106,23 +124,18 @@ bool yoloDetect::init()
     }
     net.setPreferableBackend(backendId);
     net.setPreferableTarget(targetId);
-    if(cap.open(m_videoFile.toStdString())){
+    if(!cap.open(m_videoFile.toStdString())){
         qDebug() << "open video faild!!!";
         QMessageBox::warning(nullptr, "ERROR","open video faild!!!",QMessageBox::Yes);
     }else{
         /*
           需要添加异常处理
          */
+        qDebug() << "is Open:"<<cap.isOpened();
     }
 
     m_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
     m_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
-
-
+    qDebug() << "video_w:" << m_width << " " << "video_h:" << m_height;
 
 }
-
-//void yoloDetect::sendBoxes(std::vector<cv::Rect> boxes)
-//{
-
-//}

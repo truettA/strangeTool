@@ -18,9 +18,13 @@ yoloTool::yoloTool(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->rcpuButton->setChecked(true);
+    qRegisterMetaType<cv::Rect>("cv::Rect");
+    qRegisterMetaType<cv::Mat>("cv::Mat");
     qRegisterMetaType<std::vector<cv::Rect>>("std::vector<cv::Rect>");
     // or
     //Q_DECLARE_METATYPE(std::vector<cv::Rect);
+    detect = nullptr;
+
 }
 
 yoloTool::~yoloTool()
@@ -49,6 +53,78 @@ void yoloTool::on_closeShowButton_clicked()
 
 void yoloTool::on_startDectButton_clicked()
 {
+   qDebug() << "开始检测";
+}
+
+void yoloTool::on_rcpuButton_clicked()
+{
+    qDebug() << "cup";
+}
+
+void yoloTool::on_rgpuButton_clicked()
+{
+    qDebug() << "gpu";
+}
+
+void yoloTool::on_selectPictureButton_clicked()
+{
+
+}
+
+void yoloTool::on_selectCfgBtn_clicked()
+{
+    qDebug() << "on_selectCfgBtn_clicked" << ";;; " << QThread::currentThread();
+    QFileDialog *fileDialog = new QFileDialog(this);
+    fileDialog->setWindowTitle("选择权重和配置文件");
+    QStringList filtersName;
+    filtersName << "(*.cfg *.weights *.txt)"
+                << "any file(*)";
+    fileDialog->setNameFilters(filtersName);
+    fileDialog->setFileMode(QFileDialog::ExistingFiles);
+    fileDialog->setViewMode(QFileDialog::Detail);
+    fileDialog->setDirectory(".");
+    QStringList cfgFileL;
+    if(fileDialog->exec() == QDialog::Accepted){
+        qDebug() << "exec:";
+        cfgFileL = fileDialog->selectedFiles();
+    }
+    if(!cfgFileL.isEmpty()){
+        for(auto cfgFile:cfgFileL){
+            if(cfgFile.lastIndexOf(".cfg") != -1){
+                ui->cfgEdit->setText(cfgFile);
+            }else if(cfgFile.lastIndexOf(".weights") != -1){
+                ui->weightEdit->setText(cfgFile);
+            }else if(cfgFile.lastIndexOf(".txt") != -1){
+                ui->classesFileEdt->setText(cfgFile);
+            }
+        }
+    }
+    fileDialog->destroyed();
+
+}
+
+
+void yoloTool::on_selectVideoButton_clicked()
+{
+    qDebug() << "选择视频文件";
+    QFileDialog *fileDialog = new QFileDialog(this);
+    fileDialog->setWindowTitle("选择权重和配置文件");
+    QStringList filtersName;
+    filtersName << "(*.mp4 *.avi *.flv)"
+                << "any file(*)";
+    fileDialog->setNameFilters(filtersName);
+    fileDialog->setFileMode(QFileDialog::ExistingFile);
+    fileDialog->setViewMode(QFileDialog::Detail);
+    fileDialog->setDirectory(".");
+    QStringList videoFilePath;
+    if(fileDialog->exec() == QDialog::Accepted){
+       videoFilePath = fileDialog->selectedFiles();
+    }
+    if(!videoFilePath.isEmpty()){
+        ui->videoFileEdit->setText(videoFilePath[0]);
+    }
+    fileDialog->destroyed();
+
     /*
     * List of supported combinations backend / target:
     * |                        | DNN_BACKEND_OPENCV | DNN_BACKEND_INFERENCE_ENGINE | DNN_BACKEND_HALIDE |  DNN_BACKEND_CUDA |
@@ -77,8 +153,9 @@ void yoloTool::on_startDectButton_clicked()
     QString videoFile = ui->videoFileEdit->text();
 
     detect = new yoloDetect(videoFile,cfgFile,weight,classesFile,ui->threadEdit->text().toDouble());
+    connect(ui->startDectButton, &QPushButton::clicked, detect, &yoloDetect::detctImg);
+
     connect(detect, &yoloDetect::sendBoxes, this, &yoloTool::recvBoxes);
-//    connect(detect, &yoloDetect::sendBoxes, nullptr, [](){});
 
     if(ui->rcpuButton->isChecked()){
         detect->backendId = cv::dnn::DNN_BACKEND_OPENCV;
@@ -87,13 +164,11 @@ void yoloTool::on_startDectButton_clicked()
         detect->backendId = cv::dnn::DNN_BACKEND_CUDA;
         detect->targetId = cv::dnn::DNN_TARGET_CUDA;
     }
-    qThread = new QThread();
+    QThread *qThread = new QThread();
     detect->moveToThread(qThread);
 
-    qThread->start();
     detect->init();
-
-//    connect(ui->, &QPushButton::clicked, detect, &yoloDetect::detctImg);
+    qThread->start();
 
 
     connect(qThread, &QThread::started, detect, [=](){
@@ -101,83 +176,8 @@ void yoloTool::on_startDectButton_clicked()
     });
     connect(qThread, &QThread::finished, this, [=](){
         qDebug() <<"finished" <<QThread::currentThread();
+        qThread->destroyed();
     });
-
-
-}
-
-void yoloTool::on_rcpuButton_clicked()
-{
-    qDebug() << "cup";
-}
-
-void yoloTool::on_rgpuButton_clicked()
-{
-    qDebug() << "gpu";
-}
-
-void yoloTool::on_selectPictureButton_clicked()
-{
-
-}
-
-void yoloTool::on_selectCfgBtn_clicked()
-{
-
-    qDebug() << "on_selectCfgBtn_clicked" << ";;; " << QThread::currentThread();
-    QFileDialog *fileDialog = new QFileDialog(this);
-    fileDialog->setWindowTitle("选择权重和配置文件");
-    QStringList filtersName;
-    filtersName << "(*.cfg *.weights *.txt)"
-                << "any file(*)";
-    fileDialog->setNameFilters(filtersName);
-    fileDialog->setFileMode(QFileDialog::ExistingFiles);
-    fileDialog->setViewMode(QFileDialog::Detail);
-    fileDialog->setDirectory(".");
-    QStringList cfgFile;
-    if(fileDialog->exec() == QDialog::Accepted){
-        qDebug() << "exec:";
-        cfgFile = fileDialog->selectedFiles();
-    }
-
-    //需要修改判断
-    if(!cfgFile.isEmpty()){
-        ui->cfgEdit->setText(cfgFile.at(0));
-        ui->weightEdit->setText(cfgFile.at(1));
-        ui->classesFileEdt->setText(cfgFile[2]);
-    }
-
-//    QThread *thread = new QThread();
-//    UpdataUI *updataUi = new UpdataUI();
-//    updataUi->moveToThread(thread);
-//    connect(thread, &QThread::finished, updataUi, &QObject::deleteLater);//该线程结束时销毁
-//    thread->start();
-//    updataUi->operate(cfgFile);
-
-    fileDialog->destroyed();
-}
-
-
-void yoloTool::on_selectVideoButton_clicked()
-{
-    qDebug() << "选择视频文件";
-    QFileDialog *fileDialog = new QFileDialog(this);
-    fileDialog->setWindowTitle("选择权重和配置文件");
-    QStringList filtersName;
-    filtersName << "(*.mp4 *.avi *.flv)"
-                << "any file(*)";
-    fileDialog->setNameFilters(filtersName);
-    fileDialog->setFileMode(QFileDialog::ExistingFile);
-    fileDialog->setViewMode(QFileDialog::Detail);
-    fileDialog->setDirectory(".");
-    QStringList videoFilePath;
-    if(fileDialog->exec() == QDialog::Accepted){
-       videoFilePath = fileDialog->selectedFiles();
-    }
-    if(!videoFilePath.isEmpty()){
-        ui->videoFileEdit->setText(videoFilePath[0]);
-    }
-    fileDialog->destroyed();
 }
 
 
@@ -189,8 +189,16 @@ void yoloTool::on_saveBtn_clicked()
     }
 
 }
-void yoloTool::recvBoxes(std::vector<cv::Rect> boxes)
+void yoloTool::recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame)
 {
+    qDebug() <<"recv=============";
+    cv::Mat cloneFrame = frame;
 
+    for(auto box:boxes){
+        QString textBox = "x:" + QString::number(box.x) + "y:" + QString::number(box.y) + "width:" + QString::number(box.width) + "height:" + QString::number(box.height) + '\n';
+        cv::rectangle(cloneFrame, cv::Point(box.x, box.y), cv::Point(box.x+box.width, box.y+box.height), cv::Scalar(255, 178, 50), 3);
+        ui->boxesBrowser->insertPlainText(textBox);
+    }
+     cv::imshow("show", cloneFrame);
 }
 

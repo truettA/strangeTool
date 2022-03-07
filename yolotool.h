@@ -20,7 +20,6 @@ public:
 private:
     Ui::yoloTool *ui;
 
-    QThread *qThread;
     yoloDetect *detect;
 private slots:
     void closeEvent(QCloseEvent *event);
@@ -36,7 +35,7 @@ private slots:
     void on_saveBtn_clicked();
 
 public slots:
-    void recvBoxes(std::vector<cv::Rect> boxes);
+    void recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame);
 };
 
 #endif // YOLOTOOL_H

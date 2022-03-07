@@ -1,5 +1,5 @@
 QT       += core gui
-#https://www.its203.com/article/weixin_42842157/111715612?2022-03-05?2022-03-06
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11

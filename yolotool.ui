@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>724</width>
+    <width>865</width>
     <height>583</height>
    </rect>
   </property>
@@ -16,8 +16,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>250</y>
+     <x>450</x>
+     <y>340</y>
      <width>152</width>
      <height>220</height>
     </rect>
@@ -107,8 +107,8 @@
   <widget class="QWidget" name="widget_2" native="true">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>30</y>
+     <x>10</x>
+     <y>50</y>
      <width>521</width>
      <height>171</height>
     </rect>
@@ -291,6 +291,16 @@
    </property>
    <property name="text">
     <string>scalefactor：</string>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="boxesBrowser">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>60</y>
+     <width>256</width>
+     <height>192</height>
+    </rect>
    </property>
   </widget>
  </widget>
