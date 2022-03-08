@@ -1,34 +1,27 @@
 #ifndef DRAWIMG_H
 #define DRAWIMG_H
 
-#include <QWidget>
+#include <QObject>
+#include <QPainter>
 #include <opencv2/opencv.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/video.hpp>
+#include <opencv2/core.hpp>
 
-class DrawImg : public QWidget
+
+
+class DrawImg : public QObject, public QPainter
 {
     Q_OBJECT
 public:
-    explicit DrawImg(QWidget *parent = nullptr);
+    explicit DrawImg(QObject *parent = nullptr);
 
 public:
-    //opencv 绘制参数
-    int m_fontFace;                 //字体类型
-    cv::Point m_org;                //图像中文本字符串的左下角。
-    cv::Scalar m_textColor;         //绘制颜色
-    cv::Scalar m_rectangleColor;    //绘制方形颜色
-    std::string m_text;             //绘制文字内容
-    int m_textThickness;            //文本字体粗细
-    int m_ractThickness;            // 方框线条粗细
-    double m_fontScale;
+    QImage qImage;
 
-
-
-public:
-    void drawBoxs(cv::Mat &frame, std::vector<cv::Rect> &boxes, std::vector<int> &indices, std::vector<float> &confidences);
+public slots:
+    void recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame);
 
 signals:
+
 
 };
 

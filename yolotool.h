@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QEvent>
 #include "yolodetect.h"
+#include "drawimg.h"
 
 namespace Ui {
 class yoloTool;
@@ -16,6 +17,9 @@ class yoloTool : public QWidget
 public:
     explicit yoloTool(QWidget *parent = nullptr);
     ~yoloTool();
+
+public:
+    DrawImg *drawImg;
 
 private:
     Ui::yoloTool *ui;
@@ -36,6 +40,7 @@ private slots:
 
 public slots:
     void recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame);
+//    void sendWorking(std::vector<cv::Rect> boxes);
 };
 
 #endif // YOLOTOOL_H

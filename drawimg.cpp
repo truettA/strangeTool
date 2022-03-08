@@ -1,21 +1,18 @@
 #include "drawimg.h"
+#include <QDebug>
 
-DrawImg::DrawImg(QWidget *parent)
-    : QWidget{parent}
+DrawImg::DrawImg(QObject *parent)
+    : QObject{parent}
 {
 
 }
 
-void DrawImg::drawBoxs(cv::Mat &frame, std::vector<cv::Rect> &boxes, std::vector<int> &indices, std::vector<float> &confidences)
+void DrawImg::recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame)
 {
-    for(int i = 0; i < indices.size(); i++){
-        int idx = indices[i];
-        cv::Rect box = boxes[idx];
-        cv::rectangle(frame, cv::Point(box.x, box.y), cv::Point(box.x+box.width, box.y+box.height), m_rectangleColor, m_ractThickness);
-        std::string label = cv::format("%.5f", confidences[idx]);
-        int baseLine;
-        cv::Size labelSize = cv::getTextSize(label, m_fontFace, m_fontScale, m_textThickness, &baseLine);
-        int top = cv::max(box.y, labelSize.height);
+    cv::Mat cloneFrame = frame.clone();
+    cv::cvtColor(cloneFrame, cloneFrame, cv::COLOR_RGB2BGR);
+    const uchar *pSrc = (const uchar*)cloneFrame.data;
+    qImage = QImage(pSrc, cloneFrame.cols, cloneFrame.rows, cloneFrame.step, QImage::Format_RGB888);
+    qDebug() << "drawImg:" << cloneFrame.type() ;
 
-    }
 }

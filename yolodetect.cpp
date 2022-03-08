@@ -9,14 +9,14 @@ yoloDetect::yoloDetect(QObject *parent):QObject(parent)
     qDebug() << "yoloDetect";
 }
 
-yoloDetect::yoloDetect(const QString &videoFile,const  QString &modelCfg,const QString &weightsFile, const QString &classesFile, double thread)
+yoloDetect::yoloDetect(const QString &videoFile,const  QString &modelCfg,const QString &weightsFile, const QString &classesFile)
 {
 
     m_videoFile = videoFile;
     m_modelCfg = modelCfg;
     m_weightsFile = weightsFile;
     m_classesFile = classesFile;
-    m_thread = thread;
+    m_thread = 0.4;
     m_NMSThread = 0.35;
     scalefactor = 1/255.0;
 
@@ -40,7 +40,6 @@ void yoloDetect::detctImg()
 
     int width = 512;
     int height = 288;
-
 
     while(true){
         QElapsedTimer time;

@@ -16,7 +16,7 @@ class yoloDetect:public QObject
 
 public:
     yoloDetect(QObject *parent = nullptr);
-    yoloDetect(const QString &videoFile, const  QString &modelCfg, const QString &weightsFile, const QString &classesFile, double thread);
+    yoloDetect(const QString &videoFile, const  QString &modelCfg, const QString &weightsFile, const QString &classesFile);
     ~yoloDetect();
 
 

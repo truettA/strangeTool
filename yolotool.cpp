@@ -6,7 +6,8 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "updataui.h"
+#include <QPixmap>
+#include <QValidator>
 #include "yolotool.h"
 #include "ui_yolotool.h"
 #include "yolodetect.h"
@@ -21,10 +22,22 @@ yoloTool::yoloTool(QWidget *parent) :
     qRegisterMetaType<cv::Rect>("cv::Rect");
     qRegisterMetaType<cv::Mat>("cv::Mat");
     qRegisterMetaType<std::vector<cv::Rect>>("std::vector<cv::Rect>");
+
+    //限制label输入
+    QDoubleValidator *qDoubleValidator = new QDoubleValidator(0, 1, 5, this);
+    ui->nmsTdEdit->setValidator(qDoubleValidator);
+    ui->threadEdit->setValidator(qDoubleValidator);
+    ui->scalefrEdit->setValidator(qDoubleValidator);
+
+
+
     // or
     //Q_DECLARE_METATYPE(std::vector<cv::Rect);
     detect = nullptr;
-
+    drawImg = new DrawImg();
+    QThread *fileWork = new QThread();
+    drawImg->moveToThread(fileWork);
+    fileWork->start();
 }
 
 yoloTool::~yoloTool()
@@ -35,7 +48,7 @@ yoloTool::~yoloTool()
 
 void yoloTool::closeEvent(QCloseEvent *event)
 {
-    delete this;
+    this->destroy();
     qDebug() << "yoloWindows closeEvent";
 }
 
@@ -85,7 +98,6 @@ void yoloTool::on_selectCfgBtn_clicked()
     fileDialog->setDirectory(".");
     QStringList cfgFileL;
     if(fileDialog->exec() == QDialog::Accepted){
-        qDebug() << "exec:";
         cfgFileL = fileDialog->selectedFiles();
     }
     if(!cfgFileL.isEmpty()){
@@ -152,10 +164,18 @@ void yoloTool::on_selectVideoButton_clicked()
     }
     QString videoFile = ui->videoFileEdit->text();
 
-    detect = new yoloDetect(videoFile,cfgFile,weight,classesFile,ui->threadEdit->text().toDouble());
+    detect = new yoloDetect(videoFile,cfgFile,weight,classesFile);
+    if(!ui->threadEdit->text().isEmpty()){
+        detect->m_thread = ui->threadEdit->text().toDouble();
+        detect->m_NMSThread = ui->nmsTdEdit->text().toDouble();
+        detect->scalefactor = ui->scalefrEdit->text().toDouble();
+    }
     connect(ui->startDectButton, &QPushButton::clicked, detect, &yoloDetect::detctImg);
 
+    connect(detect, &yoloDetect::sendBoxes, drawImg, &DrawImg::recvBoxes);
     connect(detect, &yoloDetect::sendBoxes, this, &yoloTool::recvBoxes);
+
+
 
     if(ui->rcpuButton->isChecked()){
         detect->backendId = cv::dnn::DNN_BACKEND_OPENCV;
@@ -191,14 +211,18 @@ void yoloTool::on_saveBtn_clicked()
 }
 void yoloTool::recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame)
 {
-    qDebug() <<"recv=============";
+    qDebug() <<"yrecv=============";
     cv::Mat cloneFrame = frame;
 
     for(auto box:boxes){
-        QString textBox = "x:" + QString::number(box.x) + "y:" + QString::number(box.y) + "width:" + QString::number(box.width) + "height:" + QString::number(box.height) + '\n';
+        QString textBox = "x:" + QString::number(box.x) + " y:" + QString::number(box.y) + " width:" + QString::number(box.width) + "height:" + QString::number(box.height) + '\n';
         cv::rectangle(cloneFrame, cv::Point(box.x, box.y), cv::Point(box.x+box.width, box.y+box.height), cv::Scalar(255, 178, 50), 3);
         ui->boxesBrowser->insertPlainText(textBox);
     }
-     cv::imshow("show", cloneFrame);
+    QPixmap qPixmap = QPixmap::fromImage(drawImg->qImage);
+    if(!qPixmap.isNull()){
+        ui->imgLabel->setPixmap(qPixmap.scaled(ui->imgLabel->size(), Qt::KeepAspectRatio));
+    }
+//     cv::imshow("show", cloneFrame);
 }
 

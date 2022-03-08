@@ -58,7 +58,6 @@ SOURCES += \
     main.cpp \
     mainWidget.cpp \
     rwfile.cpp \
-    updataui.cpp \
     yolodetect.cpp \
     yolotool.cpp
 
@@ -66,7 +65,6 @@ HEADERS += \
     drawimg.h \
     mainWidget.h \
     rwfile.h \
-    updataui.h \
     yolodetect.h \
     yolotool.h
 
