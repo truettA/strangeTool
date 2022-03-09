@@ -4,6 +4,7 @@
 #include <QString>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/core.hpp>
 #include <opencv2/video.hpp>
 #include <opencv2/dnn.hpp>
 #include <QObject>
@@ -31,10 +32,11 @@ public:
     double m_thread;
     double m_NMSThread;
     double scalefactor;
+    int fpsN;
 
 public:
     std::vector<cv::Rect> boxes;
-    std::vector<int> indices;
+
 
 private:
     std::vector<float> confidences;
@@ -53,7 +55,7 @@ public:
 
 
 signals:
-    void sendBoxes(std::vector<cv::Rect> boxes, cv::Mat frame);
+    void sendBoxes(std::vector<cv::Rect> boxes, std::vector<int> classIds, cv::Mat frame);
 
 
 };

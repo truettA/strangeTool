@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/core.hpp>
 #include <opencv2/video.hpp>
 #include <QThread>
 #include <QPushButton>
@@ -22,22 +23,37 @@ yoloTool::yoloTool(QWidget *parent) :
     qRegisterMetaType<cv::Rect>("cv::Rect");
     qRegisterMetaType<cv::Mat>("cv::Mat");
     qRegisterMetaType<std::vector<cv::Rect>>("std::vector<cv::Rect>");
+    qRegisterMetaType<std::vector<int>>("std::vector<int>");
 
     //限制label输入
     QDoubleValidator *qDoubleValidator = new QDoubleValidator(0, 1, 5, this);
+    QIntValidator *qIntValidator = new QIntValidator(1, 100, this);
     ui->nmsTdEdit->setValidator(qDoubleValidator);
     ui->threadEdit->setValidator(qDoubleValidator);
     ui->scalefrEdit->setValidator(qDoubleValidator);
-
+    ui->fpsN->setValidator(qIntValidator);
 
 
     // or
     //Q_DECLARE_METATYPE(std::vector<cv::Rect);
     detect = nullptr;
     drawImg = new DrawImg();
+    rwFile = new RWFile();
+    QThread *frawImgWork = new QThread();
     QThread *fileWork = new QThread();
-    drawImg->moveToThread(fileWork);
+    drawImg->moveToThread(frawImgWork);
+    frawImgWork->start();
+    rwFile->moveToThread(fileWork);
     fileWork->start();
+    connect(frawImgWork, &QThread::finished, this, [=](){
+        qDebug() <<"frawImgWork finished" << QThread::currentThread();
+        frawImgWork->destroyed();
+    });
+    connect(fileWork, &QThread::finished, this, [=](){
+        qDebug() <<"fileWork finished" << QThread::currentThread();
+        fileWork->destroyed();
+    });
+
 }
 
 yoloTool::~yoloTool()
@@ -112,7 +128,6 @@ void yoloTool::on_selectCfgBtn_clicked()
         }
     }
     fileDialog->destroyed();
-
 }
 
 
@@ -135,6 +150,9 @@ void yoloTool::on_selectVideoButton_clicked()
     if(!videoFilePath.isEmpty()){
         ui->videoFileEdit->setText(videoFilePath[0]);
     }
+    QStringList tmpList = ui->videoFileEdit->text().split('/');
+    QString videoSrcName = tmpList.last();
+//    rwFile->m_fileName = videoSrcName.split(".")[0];
     fileDialog->destroyed();
 
     /*
@@ -169,13 +187,18 @@ void yoloTool::on_selectVideoButton_clicked()
         detect->m_thread = ui->threadEdit->text().toDouble();
         detect->m_NMSThread = ui->nmsTdEdit->text().toDouble();
         detect->scalefactor = ui->scalefrEdit->text().toDouble();
+        detect->fpsN = ui->fpsN->text().toInt();
     }
-    connect(ui->startDectButton, &QPushButton::clicked, detect, &yoloDetect::detctImg);
+//    if(!ui->saveEdit->text().isEmpty()){
+//        rwFile->m_savePath = ui->saveEdit->text();
+//    }else{
+//        rwFile->m_savePath = "./save";
+//    }
 
+    connect(ui->startDectButton, &QPushButton::clicked, detect, &yoloDetect::detctImg);
+//    connect(detect, &yoloDetect::sendBoxes, rwFile, &RWFile::recvBoxes);
     connect(detect, &yoloDetect::sendBoxes, drawImg, &DrawImg::recvBoxes);
     connect(detect, &yoloDetect::sendBoxes, this, &yoloTool::recvBoxes);
-
-
 
     if(ui->rcpuButton->isChecked()){
         detect->backendId = cv::dnn::DNN_BACKEND_OPENCV;
@@ -189,7 +212,6 @@ void yoloTool::on_selectVideoButton_clicked()
 
     detect->init();
     qThread->start();
-
 
     connect(qThread, &QThread::started, detect, [=](){
         qDebug() <<"started" <<QThread::currentThread();
@@ -209,7 +231,7 @@ void yoloTool::on_saveBtn_clicked()
     }
 
 }
-void yoloTool::recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame)
+void yoloTool::recvBoxes(std::vector<cv::Rect> boxes, std::vector<int> classIds, cv::Mat frame)
 {
     qDebug() <<"yrecv=============";
     cv::Mat cloneFrame = frame;

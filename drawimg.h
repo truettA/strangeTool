@@ -7,7 +7,6 @@
 #include <opencv2/core.hpp>
 
 
-
 class DrawImg : public QObject, public QPainter
 {
     Q_OBJECT
@@ -16,9 +15,10 @@ public:
 
 public:
     QImage qImage;
+    bool isShowImg;
 
 public slots:
-    void recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame);
+    void recvBoxes(std::vector<cv::Rect> boxes, std::vector<int> classIds, cv::Mat frame);
 
 signals:
 

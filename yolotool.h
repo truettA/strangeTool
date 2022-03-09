@@ -5,6 +5,7 @@
 #include <QEvent>
 #include "yolodetect.h"
 #include "drawimg.h"
+#include "rwfile.h"
 
 namespace Ui {
 class yoloTool;
@@ -25,6 +26,7 @@ private:
     Ui::yoloTool *ui;
 
     yoloDetect *detect;
+    RWFile *rwFile;
 private slots:
     void closeEvent(QCloseEvent *event);
 
@@ -39,7 +41,7 @@ private slots:
     void on_saveBtn_clicked();
 
 public slots:
-    void recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame);
+    void recvBoxes(std::vector<cv::Rect> boxes, std::vector<int> classIds, cv::Mat frame);
 //    void sendWorking(std::vector<cv::Rect> boxes);
 };
 

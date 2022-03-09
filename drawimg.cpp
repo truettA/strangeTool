@@ -4,11 +4,12 @@
 DrawImg::DrawImg(QObject *parent)
     : QObject{parent}
 {
-
+    isShowImg = true;
 }
 
-void DrawImg::recvBoxes(std::vector<cv::Rect> boxes, cv::Mat frame)
+void DrawImg::recvBoxes(std::vector<cv::Rect> boxes, std::vector<int> classIds, cv::Mat frame)
 {
+    qDebug() << "recvDrawing======";
     cv::Mat cloneFrame = frame.clone();
     cv::cvtColor(cloneFrame, cloneFrame, cv::COLOR_RGB2BGR);
     const uchar *pSrc = (const uchar*)cloneFrame.data;
