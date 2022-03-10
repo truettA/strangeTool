@@ -22,15 +22,15 @@ void RWFile::readClassFile(QString classesFile, QVector<QString> &classes)
 
 void RWFile::writeText(std::vector<cv::Rect> &boxes, std::vector<int> classIds, cv::Mat frame)
 {
-    QString tmp;
+
     char cTmp[10] = {0};
     sprintf(cTmp, "%07d", numTmp);
 
     if(isSaveTxt){
         QFile file(m_savePath + "/" + m_fileName + cTmp +".txt");
         for(cv::Rect box: boxes){
+            int i = 0;
             if(file.open(QIODevice::WriteOnly)){
-                int i = 0;
                 float num1_x = (box.x + box.width/2.0)/ frame.cols;
                 float num2_y = (box.y + box.height/2.0)/ frame.rows;
                 float num3_w = box.width / (float)frame.cols;
@@ -39,6 +39,7 @@ void RWFile::writeText(std::vector<cv::Rect> &boxes, std::vector<int> classIds, 
                 i++;
                 char buf[128] = { 0 };
                 sprintf(buf, "%d %07.6f %07.6f %07.6f %07.6f\n",num0_class, num1_x, num2_y, num3_w, num4_h);
+                qDebug() <<"buf: " <<buf;
                 file.write(buf);
 
             }
@@ -53,6 +54,7 @@ void RWFile::writeText(std::vector<cv::Rect> &boxes, std::vector<int> classIds, 
 
 void RWFile::recvBoxes(std::vector<cv::Rect> boxes, std::vector<int> classIds, cv::Mat frame)
 {
+    qDebug() << "RWfile==========";
     qDebug() << "rwfile thread:" << QThread::currentThread();
     writeText(boxes, classIds, frame);
 }

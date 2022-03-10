@@ -196,7 +196,7 @@ void yoloTool::on_selectVideoButton_clicked()
 //    }
 
     connect(ui->startDectButton, &QPushButton::clicked, detect, &yoloDetect::detctImg);
-//    connect(detect, &yoloDetect::sendBoxes, rwFile, &RWFile::recvBoxes);
+    connect(detect, &yoloDetect::sendBoxes, rwFile, &RWFile::recvBoxes);
     connect(detect, &yoloDetect::sendBoxes, drawImg, &DrawImg::recvBoxes);
     connect(detect, &yoloDetect::sendBoxes, this, &yoloTool::recvBoxes);
 
@@ -233,18 +233,26 @@ void yoloTool::on_saveBtn_clicked()
 }
 void yoloTool::recvBoxes(std::vector<cv::Rect> boxes, std::vector<int> classIds, cv::Mat frame)
 {
-    qDebug() <<"yrecv=============";
+    qDebug() <<"yolo recv=============";
     cv::Mat cloneFrame = frame;
 
+
+    int i = 0;
     for(auto box:boxes){
-        QString textBox = "x:" + QString::number(box.x) + " y:" + QString::number(box.y) + " width:" + QString::number(box.width) + "height:" + QString::number(box.height) + '\n';
+        QString textBox = "classesId:" + QString::number(classIds[i]) + "x:" + QString::number(box.x) + " y:" + QString::number(box.y) + " width:" + QString::number(box.width) + "height:" + QString::number(box.height) + '\n';
         cv::rectangle(cloneFrame, cv::Point(box.x, box.y), cv::Point(box.x+box.width, box.y+box.height), cv::Scalar(255, 178, 50), 3);
+        std::string aa = classIds[i] + " ";
+        cv::putText(cloneFrame, aa, cv::Point(box.x, box.y -8), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 0), 1);
         ui->boxesBrowser->insertPlainText(textBox);
+        i++;
     }
-    QPixmap qPixmap = QPixmap::fromImage(drawImg->qImage);
-    if(!qPixmap.isNull()){
-        ui->imgLabel->setPixmap(qPixmap.scaled(ui->imgLabel->size(), Qt::KeepAspectRatio));
+    if(!drawImg->qImage.isNull()){
+            QPixmap qPixmap = QPixmap::fromImage(drawImg->qImage);
+            if(!qPixmap.isNull()){
+                ui->imgLabel->setPixmap(qPixmap.scaled(ui->imgLabel->size(), Qt::KeepAspectRatio));
+            }
     }
+
 //     cv::imshow("show", cloneFrame);
 }
 
